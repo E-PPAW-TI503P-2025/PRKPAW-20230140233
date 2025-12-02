@@ -22,13 +22,6 @@ export default function DashboardPage() {
           ANDA BERHASIL MASUK KE DASHBOARD
         </p>
 
-        <button
-          onClick={logout}
-          className="px-8 py-3 bg-white text-red-600 font-bold rounded-xl shadow-lg hover:bg-red-100 transition"
-        >
-          Logout
-        </button>
-
       </div>
 
     </div>
