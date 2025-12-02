@@ -1,36 +1,41 @@
-const { Presensi } = require("../models");
+const { Presensi, User } = require("../models");
 const { Op } = require("sequelize");
 
 exports.getDailyReport = async (req, res) => {
   try {
     const { nama, tanggal } = req.query;
-    let options = { where: {} };
 
+    let options = {
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["nama", "email", "role"], // AMBIL NAMA DI SINI
+        },
+      ],
+      where: {},
+      order: [["checkIn", "DESC"]],
+    };
+
+    // Filter berdasarkan nama
     if (nama) {
-      options.where.nama = { [Op.like]: `%${nama}%` };
+      options.include[0].where = {
+        nama: { [Op.like]: `%${nama}%` },
+      };
     }
 
+    // Filter berdasarkan tanggal
     if (tanggal) {
-      const validDate = /^\d{4}-\d{2}-\d{2}$/;
-      if (!validDate.test(tanggal)) {
-        return res.status(400).json({
-          message: "Format tanggal tidak valid, gunakan format YYYY-MM-DD",
-        });
-      }
-      
-      const startDate = new Date(tanggal);
-      const endDate = new Date(tanggal);
-      endDate.setHours(23, 59, 59, 999);
+      const start = new Date(`${tanggal} 00:00:00`);
+      const end = new Date(`${tanggal} 23:59:59`);
 
-      options.where.checkIn = {
-        [Op.between]: [startDate, endDate],
-      };
+      options.where.checkIn = { [Op.between]: [start, end] };
     }
 
     const records = await Presensi.findAll(options);
 
     res.json({
-      reportDate: new Date().toLocaleDateString(),
+      message: "Laporan harian berhasil diambil",
       data: records,
     });
   } catch (error) {
