@@ -2,23 +2,26 @@ const { Presensi } = require("../models");
 const { format } = require("date-fns-tz");
 const timeZone = "Asia/Jakarta";
 
-/* ============================
-   CHECK-IN
+/* =============================
+   CHECK-IN (DENGAN FOTO)
 ============================= */
 exports.CheckIn = async (req, res) => {
   try {
     const { id: userId, nama: userName } = req.user;
     const waktuSekarang = new Date();
-    const { latitude, longitude } = req.body; // ← LOKASI DARI FRONTEND
+    const { latitude, longitude } = req.body;
+
+    // Nama file foto
+    const buktiFoto = req.file ? req.file.filename : null;
 
     // Cek apakah sudah check-in
     const existingRecord = await Presensi.findOne({
-      where: { userId: userId, checkOut: null },
+      where: { userId, checkOut: null }
     });
 
     if (existingRecord) {
       return res.status(400).json({
-        message: "Anda sudah melakukan check-in hari ini.",
+        message: "Anda sudah melakukan check-in hari ini."
       });
     }
 
@@ -29,16 +32,8 @@ exports.CheckIn = async (req, res) => {
       checkIn: waktuSekarang,
       latitude,
       longitude,
+      buktiFoto
     });
-
-    const formattedData = {
-      userId: newRecord.userId,
-      nama: newRecord.nama,
-      checkIn: format(newRecord.checkIn, "yyyy-MM-dd HH:mm:ssXXX", { timeZone }),
-      checkOut: null,
-      latitude: newRecord.latitude,
-      longitude: newRecord.longitude,
-    };
 
     res.status(201).json({
       message: `Halo ${userName}, check-in berhasil pada pukul ${format(
@@ -46,17 +41,19 @@ exports.CheckIn = async (req, res) => {
         "HH:mm:ss",
         { timeZone }
       )} WIB`,
-      data: formattedData,
+      data: newRecord
     });
+
   } catch (error) {
     res.status(500).json({
       message: "Terjadi kesalahan pada server",
-      error: error.message,
+      error: error.message
     });
   }
 };
 
-/* ============================
+
+/* =============================
    CHECK-OUT
 ============================= */
 exports.CheckOut = async (req, res) => {
@@ -65,26 +62,17 @@ exports.CheckOut = async (req, res) => {
     const waktuSekarang = new Date();
 
     const recordToUpdate = await Presensi.findOne({
-      where: { userId, checkOut: null },
+      where: { userId, checkOut: null }
     });
 
     if (!recordToUpdate) {
       return res.status(404).json({
-        message: "Tidak ditemukan catatan check-in yang aktif.",
+        message: "Tidak ditemukan catatan check-in yang aktif."
       });
     }
 
     recordToUpdate.checkOut = waktuSekarang;
     await recordToUpdate.save();
-
-    const formattedData = {
-      userId: recordToUpdate.userId,
-      nama: recordToUpdate.nama,
-      checkIn: format(recordToUpdate.checkIn, "yyyy-MM-dd HH:mm:ssXXX", { timeZone }),
-      checkOut: format(recordToUpdate.checkOut, "yyyy-MM-dd HH:mm:ssXXX", { timeZone }),
-      latitude: recordToUpdate.latitude,
-      longitude: recordToUpdate.longitude,
-    };
 
     res.json({
       message: `Selamat jalan ${userName}, check-out berhasil pada pukul ${format(
@@ -92,17 +80,19 @@ exports.CheckOut = async (req, res) => {
         "HH:mm:ss",
         { timeZone }
       )} WIB`,
-      data: formattedData,
+      data: recordToUpdate
     });
+
   } catch (error) {
     res.status(500).json({
       message: "Terjadi kesalahan pada server",
-      error: error.message,
+      error: error.message
     });
   }
 };
 
-/* ============================
+
+/* =============================
    DELETE PRESENSI
 ============================= */
 exports.deletePresensi = async (req, res) => {
@@ -113,31 +103,29 @@ exports.deletePresensi = async (req, res) => {
     const recordToDelete = await Presensi.findByPk(presensiId);
 
     if (!recordToDelete) {
-      return res.status(404).json({
-        message: "Catatan presensi tidak ditemukan.",
-      });
+      return res.status(404).json({ message: "Catatan presensi tidak ditemukan." });
     }
 
     if (recordToDelete.userId !== userId) {
-      return res.status(403).json({
-        message: "Akses ditolak: Anda bukan pemilik catatan ini.",
-      });
+      return res.status(403).json({ message: "Akses ditolak." });
     }
 
     await recordToDelete.destroy();
 
     return res.status(200).json({
-      message: `Data presensi dengan ID ${presensiId} berhasil dihapus.`,
+      message: `Data presensi ID ${presensiId} berhasil dihapus.`
     });
+
   } catch (error) {
     res.status(500).json({
       message: "Terjadi kesalahan pada server",
-      error: error.message,
+      error: error.message
     });
   }
 };
 
-/* ============================
+
+/* =============================
    UPDATE PRESENSI
 ============================= */
 exports.updatePresensi = async (req, res) => {
@@ -149,27 +137,32 @@ exports.updatePresensi = async (req, res) => {
 
     if (!recordToUpdate) {
       return res.status(404).json({
-        message: "Catatan presensi tidak ditemukan.",
+        message: "Catatan presensi tidak ditemukan."
       });
     }
 
-    // Update field jika disediakan
     recordToUpdate.checkIn = checkIn || recordToUpdate.checkIn;
     recordToUpdate.checkOut = checkOut || recordToUpdate.checkOut;
     recordToUpdate.nama = nama || recordToUpdate.nama;
     recordToUpdate.latitude = latitude || recordToUpdate.latitude;
     recordToUpdate.longitude = longitude || recordToUpdate.longitude;
 
+    // Update foto jika ada
+    if (req.file) {
+      recordToUpdate.buktiFoto = req.file.filename;
+    }
+
     await recordToUpdate.save();
 
     res.json({
       message: "Data presensi berhasil diperbarui.",
-      data: recordToUpdate,
+      data: recordToUpdate
     });
+
   } catch (error) {
     res.status(500).json({
       message: "Terjadi kesalahan pada server",
-      error: error.message,
+      error: error.message
     });
   }
 };

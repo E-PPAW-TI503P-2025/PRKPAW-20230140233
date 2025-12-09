@@ -6,6 +6,8 @@ function ReportPage() {
   const [reports, setReports] = useState([]);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null); // <-- modal image
+
   const navigate = useNavigate();
 
   const fetchReports = async (query = "") => {
@@ -80,8 +82,12 @@ function ReportPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">
                   Check-Out
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">
+                  Bukti Foto
+                </th>
               </tr>
             </thead>
+
             <tbody className="bg-white divide-y divide-gray-200">
               {reports.length > 0 ? (
                 reports.map((p) => (
@@ -89,25 +95,58 @@ function ReportPage() {
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {p.user ? p.user.nama : "N/A"}
                     </td>
+
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {new Date(p.checkIn).toLocaleString("id-ID")}
                     </td>
+
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {p.checkOut
                         ? new Date(p.checkOut).toLocaleString("id-ID")
                         : "Belum Check-Out"}
                     </td>
+
+                    {/* Foto bisa diklik */}
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {p.buktiFotoUrl ? (
+                        <img
+                          src={p.buktiFotoUrl}
+                          alt="Bukti"
+                          onClick={() => setSelectedImage(p.buktiFotoUrl)}
+                          className="w-20 h-20 object-cover rounded-md border cursor-pointer hover:opacity-80"
+                        />
+                      ) : (
+                        <span className="text-gray-400">Tidak ada foto</span>
+                      )}
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="3" className="px-6 py-4 text-center text-gray-500">
+                  <td
+                    colSpan="4"
+                    className="px-6 py-4 text-center text-gray-500"
+                  >
                     Tidak ada data yang ditemukan.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Modal Foto */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+          onClick={() => setSelectedImage(null)}
+        >
+          <img
+            src={selectedImage}
+            alt="Preview"
+            className="max-w-[90%] max-h-[90%] rounded shadow-lg"
+          />
         </div>
       )}
     </div>
