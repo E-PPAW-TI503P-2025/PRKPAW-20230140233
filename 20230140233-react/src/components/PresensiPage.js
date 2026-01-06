@@ -94,7 +94,6 @@ function PresensiPage() {
     if (!image) return setError("Foto wajib diambil dulu.");
 
     try {
-      // BASE64 → FILE (Fix utama)
       const file = base64ToFile(image, "selfie.jpg");
 
       const formData = new FormData();
@@ -175,15 +174,24 @@ function PresensiPage() {
       <div className="bg-white p-4 rounded-lg shadow-md w-full max-w-6xl mb-8">
         <h3 className="text-xl font-semibold mb-4">Ambil Foto Selfie</h3>
 
-        <div className="my-4 border rounded-lg overflow-hidden bg-black">
+        <div className="my-4 border rounded-lg overflow-hidden flex justify-center p-4">
           {image ? (
-            <img src={image} alt="Selfie" className="w-full" />
+            <img
+              src={image}
+              alt="Selfie"
+              className="w-64 h-64 object-cover rounded-lg"
+            />
           ) : (
             <Webcam
               audio={false}
               ref={webcamRef}
               screenshotFormat="image/jpeg"
-              className="w-full"
+              className="w-64 h-64 object-cover rounded-lg"
+              videoConstraints={{
+                width: 300,
+                height: 300,
+                facingMode: "user",
+              }}
             />
           )}
         </div>

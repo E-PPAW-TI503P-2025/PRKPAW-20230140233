@@ -9,7 +9,7 @@ import ReportPage from "./components/ReportPage";
 import Navbar from "./components/Navbar";
 
 import "leaflet/dist/leaflet.css";
-
+<Route path="/monitoring" element={<SensorPage />} />
 const MainLayout = ({ children }) => {
   return (
     <div>

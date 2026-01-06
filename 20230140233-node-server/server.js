@@ -5,11 +5,15 @@ const path = require("path");
 
 const app = express();
 const PORT = 3001;
+const iotRoutes = require("./routes/iot");
+
+
 
 // Middleware global
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
+app.use("/api/iot", iotRoutes);
 
 // ⬅️ TARUH STATIC DISINI (SETELAH express.json)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
