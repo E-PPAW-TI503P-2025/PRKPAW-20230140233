@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function RegisterPage() {
-  const [nama, setNama] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('mahasiswa');
+  const [nama, setNama] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("mahasiswa");
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
@@ -16,43 +16,58 @@ export default function RegisterPage() {
     setError(null);
 
     try {
-      await axios.post('http://localhost:3001/api/auth/register', {
-        nama, email, password, role
+      await axios.post("http://localhost:3001/api/auth/register", {
+        nama,
+        email,
+        password,
+        role,
       });
 
-      alert('Registrasi berhasil!');
-      navigate('/login');
+      alert("Registrasi berhasil!");
+      navigate("/login");
     } catch (err) {
-      setError(err.response ? err.response.data.message : 'Registrasi gagal');
+      setError(err.response ? err.response.data.message : "Registrasi gagal");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-indigo-500 to-pink-500 flex items-center justify-center p-6">
-      <div className="bg-white/20 backdrop-blur-xl p-10 rounded-2xl shadow-2xl border border-white/30 max-w-md w-full">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+      <div className="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-200/60 max-w-md w-full">
+        
+        {/* Header Register */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
+            Buat Akun
+          </h1>
+          <p className="text-slate-400 text-sm mt-1 font-medium">
+            Daftarkan diri Anda ke Sistem Presensi Digital
+          </p>
+        </div>
 
-        <h1 className="text-4xl font-extrabold text-white text-center mb-8 tracking-wide">
-          Register
-        </h1>
-
-        <form onSubmit={handleRegister} className="space-y-6">
-
+        {/* Form Input */}
+        <form onSubmit={handleRegister} className="space-y-5">
           <div>
-            <label className="text-white font-semibold">Nama</label>
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              Nama Lengkap
+            </label>
             <input
               type="text"
-              className="w-full mt-2 p-3 rounded-lg bg-white/30 text-white placeholder-white/80 focus:ring-2 focus:ring-white"
+              required
+              className="w-full mt-1.5 p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
               value={nama}
               onChange={(e) => setNama(e.target.value)}
-              placeholder="Masukkan nama..."
+              placeholder="Masukkan nama lengkap..."
             />
           </div>
 
           <div>
-            <label className="text-white font-semibold">Email</label>
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              Alamat Email
+            </label>
             <input
               type="email"
-              className="w-full mt-2 p-3 rounded-lg bg-white/30 text-white placeholder-white/80 focus:ring-2 focus:ring-white"
+              required
+              className="w-full mt-1.5 p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Masukkan email..."
@@ -60,10 +75,13 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="text-white font-semibold">Password</label>
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              Password
+            </label>
             <input
               type="password"
-              className="w-full mt-2 p-3 rounded-lg bg-white/30 text-white placeholder-white/80 focus:ring-2 focus:ring-white"
+              required
+              className="w-full mt-1.5 p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Masukkan password..."
@@ -71,26 +89,36 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="text-white font-semibold">Role</label>
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              Hak Akses (Role)
+            </label>
             <select
-              className="w-full mt-2 p-3 rounded-lg bg-white/30 text-white focus:ring-2 focus:ring-white"
+              className="w-full mt-1.5 p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >
-              <option value="mahasiswa" className="text-black">Mahasiswa</option>
-              <option value="admin" className="text-black">Admin</option>
+              <option value="mahasiswa">Mahasiswa</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
 
-          {error && <p className="text-red-200 text-center">{error}</p>}
+          {error && (
+            <div className="p-3 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl text-xs font-medium text-center">
+              ⚠️ {error}
+            </div>
+          )}
 
-          <button className="w-full py-3 bg-white text-indigo-700 font-bold rounded-xl shadow-lg hover:bg-indigo-100 transition">
-            Register
+          <button className="w-full py-3.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow-md transition-colors text-sm tracking-wide mt-2">
+            Daftar Akun
           </button>
         </form>
 
-        <p className="text-center text-white mt-6">
-          Sudah punya akun? <a href="/login" className="underline">Login</a>
+        {/* Footer Link */}
+        <p className="text-center text-sm text-slate-500 mt-6 font-medium">
+          Sudah punya akun?{" "}
+          <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-semibold underline">
+            Login di sini
+          </Link>
         </p>
 
       </div>

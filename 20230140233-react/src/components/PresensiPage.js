@@ -5,7 +5,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Webcam from "react-webcam";
 
-// Fix default icon Leaflet
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
@@ -19,9 +18,6 @@ L.Marker.prototype.options.icon = L.icon({
   shadowSize: [41, 41],
 });
 
-// ===============================
-//   BASE64 → REAL FILE FIX
-// ===============================
 function base64ToFile(base64, filename) {
   const arr = base64.split(",");
   const mime = arr[0].match(/:(.*?);/)[1];
@@ -39,11 +35,8 @@ function base64ToFile(base64, filename) {
 function PresensiPage() {
   const [coords, setCoords] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-
-  // camera
   const [image, setImage] = useState(null);
   const webcamRef = useRef(null);
 
@@ -54,9 +47,6 @@ function PresensiPage() {
 
   const getToken = () => localStorage.getItem("token");
 
-  // ===============================
-  //         GET LOCATION
-  // ===============================
   const getLocation = () => {
     if (!navigator.geolocation) {
       setError("Geolocation tidak didukung browser.");
@@ -83,9 +73,6 @@ function PresensiPage() {
     getLocation();
   }, []);
 
-  // ===============================
-  //     CHECK-IN (WITH FOTO)
-  // ===============================
   const handleCheckIn = async () => {
     setMessage("");
     setError("");
@@ -95,7 +82,6 @@ function PresensiPage() {
 
     try {
       const file = base64ToFile(image, "selfie.jpg");
-
       const formData = new FormData();
       formData.append("latitude", coords.lat);
       formData.append("longitude", coords.lng);
@@ -118,9 +104,6 @@ function PresensiPage() {
     }
   };
 
-  // ===============================
-  //        CHECK-OUT
-  // ===============================
   const handleCheckOut = async () => {
     setMessage("");
     setError("");
@@ -139,105 +122,169 @@ function PresensiPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center pt-10 pb-10">
-
-      {/* MAP / LOKASI */}
-      {isLoading ? (
-        <div className="bg-white p-10 rounded-lg shadow-md w-full max-w-6xl mb-8 text-center">
-          <p className="text-xl font-semibold text-blue-600 animate-pulse">
-            Memuat lokasi & peta...
-          </p>
-        </div>
-      ) : coords ? (
-        <div className="bg-white p-4 rounded-lg shadow-md w-full max-w-6xl mb-8">
-          <h3 className="text-xl font-semibold mb-2">Lokasi Anda:</h3>
-
-          <div className="my-4 border rounded-lg overflow-hidden">
-            <MapContainer
-              center={[coords.lat, coords.lng]}
-              zoom={16}
-              style={{ height: "300px", width: "100%" }}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="© OpenStreetMap contributors"
-              />
-              <Marker position={[coords.lat, coords.lng]}>
-                <Popup>Lokasi Presensi Anda</Popup>
-              </Marker>
-            </MapContainer>
+    <div className="min-h-screen bg-slate-50 p-6 max-w-7xl mx-auto">
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex items-center gap-3.5 mb-2">
+          <div className="w-11 h-11 bg-slate-800 rounded-xl flex items-center justify-center shadow-sm">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
-        </div>
-      ) : null}
-
-      {/* CAMERA SECTION */}
-      <div className="bg-white p-4 rounded-lg shadow-md w-full max-w-6xl mb-8">
-        <h3 className="text-xl font-semibold mb-4">Ambil Foto Selfie</h3>
-
-        <div className="my-4 border rounded-lg overflow-hidden flex justify-center p-4">
-          {image ? (
-            <img
-              src={image}
-              alt="Selfie"
-              className="w-64 h-64 object-cover rounded-lg"
-            />
-          ) : (
-            <Webcam
-              audio={false}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              className="w-64 h-64 object-cover rounded-lg"
-              videoConstraints={{
-                width: 300,
-                height: 300,
-                facingMode: "user",
-              }}
-            />
-          )}
-        </div>
-
-        {/* BUTTON AMBIL FOTO */}
-        <div className="mb-4">
-          {!image ? (
-            <button
-              onClick={capture}
-              className="bg-blue-500 text-white px-4 py-3 rounded w-full"
-            >
-              Ambil Foto 📸
-            </button>
-          ) : (
-            <button
-              onClick={() => setImage(null)}
-              className="bg-gray-500 text-white px-4 py-3 rounded w-full"
-            >
-              Ulangi Foto 🔄
-            </button>
-          )}
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+              Presensi Digital
+            </h1>
+            <p className="text-slate-400 text-xs mt-0.5 font-medium tracking-wide uppercase">
+              Verifikasi Kehadiran Kerja
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* CHECK-IN / CHECK-OUT */}
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
-        <h2 className="text-3xl font-bold mb-6">Presensi</h2>
+      {/* Alert Messages */}
+      <div className="max-w-7xl mx-auto mb-6">
+        {message && (
+          <div className="p-4 bg-teal-50 border border-teal-100 text-teal-700 rounded-xl font-medium text-center text-sm shadow-sm">
+            ✅ {message}
+          </div>
+        )}
+        {error && (
+          <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl font-medium text-center text-sm shadow-sm">
+            ⚠️ {error}
+          </div>
+        )}
+      </div>
 
-        {message && <p className="text-green-600 mb-4">{message}</p>}
-        {error && <p className="text-red-600 mb-4">{error}</p>}
-
-        <div className="flex space-x-4">
-          <button
-            onClick={handleCheckIn}
-            className="w-full py-3 bg-green-600 text-white rounded shadow hover:bg-green-700"
-          >
-            Check-In 
-          </button>
-
-          <button
-            onClick={handleCheckOut}
-            className="w-full py-3 bg-red-600 text-white rounded shadow hover:bg-red-700"
-          >
-            Check-Out
-          </button>
+      {/* Grid Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        
+        {/* Left Card: Location */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-1.5 h-4 bg-slate-700 rounded-full"></div>
+              <h3 className="text-base font-bold text-slate-700">Lokasi Anda</h3>
+            </div>
+            
+            <div className="rounded-xl overflow-hidden shadow-inner bg-slate-50 min-h-[350px] flex flex-col justify-center relative border border-slate-200/40">
+              {isLoading ? (
+                <div className="text-center p-10">
+                  <div className="flex flex-col items-center gap-2.5">
+                    <div className="w-8 h-8 border-3 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+                    <p className="text-xs font-semibold text-slate-500">
+                      Mendeteksi koordinat...
+                    </p>
+                  </div>
+                </div>
+              ) : coords ? (
+                <MapContainer
+                  center={[coords.lat, coords.lng]}
+                  zoom={16}
+                  style={{ height: "350px", width: "100%" }}
+                  className="z-10"
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; OpenStreetMap'
+                  />
+                  <Marker position={[coords.lat, coords.lng]}>
+                    <Popup className="font-medium text-slate-700">
+                      Lokasi Anda Saat Ini
+                    </Popup>
+                  </Marker>
+                </MapContainer>
+              ) : (
+                <div className="text-center p-10">
+                  <p className="text-slate-400 text-xs font-medium">
+                    Gagal mendeteksi lokasi. Pastikan izin GPS aktif.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {coords && !isLoading && (
+            <div className="mt-4 flex items-center justify-center gap-2 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-200/60 font-mono text-slate-500">
+              <span>LAT: {coords.lat.toFixed(6)}</span>
+              <span className="text-slate-300">|</span>
+              <span>LNG: {coords.lng.toFixed(6)}</span>
+            </div>
+          )}
         </div>
+
+        {/* Right Card: Webcam / Selfie */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-1.5 h-4 bg-slate-700 rounded-full"></div>
+              <h3 className="text-base font-bold text-slate-700">Verifikasi Wajah</h3>
+            </div>
+
+            <div className="rounded-xl overflow-hidden bg-slate-900 flex justify-center items-center aspect-video relative mb-4 shadow-inner border border-slate-900">
+              {image ? (
+                <img
+                  src={image}
+                  alt="Selfie"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Webcam
+                  audio={false}
+                  ref={webcamRef}
+                  screenshotFormat="image/jpeg"
+                  className="w-full h-full object-cover opacity-95"
+                  videoConstraints={{
+                    width: 640,
+                    height: 480,
+                    facingMode: "user",
+                  }}
+                />
+              )}
+            </div>
+
+            <div className="mb-6">
+              {!image ? (
+                <button
+                  onClick={capture}
+                  className="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm py-2.5 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"
+                >
+                  Ambil Foto Selfie
+                </button>
+              ) : (
+                <button
+                  onClick={() => setImage(null)}
+                  className="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-sm py-2.5 rounded-xl transition-colors border border-slate-200 flex items-center justify-center gap-2"
+                >
+                  Ulangi Ambil Gambar
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Action Buttons (Check-In & Check-Out) */}
+          <div className="border-t border-slate-100 pt-5 mt-auto">
+            <p className="text-[10px] font-bold text-slate-400 mb-3 text-center tracking-widest uppercase">
+              Aksi Kehadiran
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={handleCheckIn}
+                className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-sm transition-colors text-sm tracking-wide"
+              >
+                Check-In
+              </button>
+
+              <button
+                onClick={handleCheckOut}
+                className="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl shadow-sm transition-colors text-sm tracking-wide"
+              >
+                Check-Out
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );

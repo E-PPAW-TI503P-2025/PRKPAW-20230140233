@@ -8,8 +8,9 @@ import PresensiPage from "./components/PresensiPage";
 import ReportPage from "./components/ReportPage";
 import Navbar from "./components/Navbar";
 
+// Leaflet CSS tetap dipertahankan karena berguna jika sistem presensi kamu menggunakan peta/lokasi (geolocation)
 import "leaflet/dist/leaflet.css";
-<Route path="/monitoring" element={<SensorPage />} />
+
 const MainLayout = ({ children }) => {
   return (
     <div>
@@ -23,11 +24,11 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public routes */}
+        {/* Halaman Publik */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-    
+        {/* Dashboard Utama */}
         <Route
           path="/dashboard"
           element={
@@ -37,7 +38,7 @@ function App() {
           }
         />
 
-      
+        {/* Halaman Melakukan Presensi */}
         <Route
           path="/presensi"
           element={
@@ -47,6 +48,7 @@ function App() {
           }
         />
 
+        {/* Rekap Laporan Presensi */}
         <Route
           path="/reports"
           element={
@@ -56,7 +58,7 @@ function App() {
           }
         />
 
-        {/* Default route */}
+        {/* Route Default (Langsung diarahkan ke Login saat web dibuka) */}
         <Route path="/" element={<LoginPage />} />
       </Routes>
     </Router>

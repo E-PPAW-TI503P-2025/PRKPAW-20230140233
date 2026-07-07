@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"; // ✅ perbaikan import
-<Link to="/monitoring" className="...">Monitoring Suhu</Link>
+import { jwtDecode } from "jwt-decode";
+
 function Navbar() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -21,23 +21,35 @@ function Navbar() {
   };
 
   return (
-    <nav className="bg-blue-700 text-white px-6 py-4 flex justify-between">
-      <div className="flex space-x-4">
-        <Link to="/dashboard" className="hover:underline">Dashboard</Link>
-        <Link to="/presensi" className="hover:underline">Presensi</Link>
+    <nav className="bg-slate-900 text-white px-6 py-4 flex justify-between items-center border-b border-slate-800 shadow-sm">
+      {/* Menu Navigasi Kiri */}
+      <div className="flex space-x-6 text-sm font-medium tracking-wide">
+        <Link to="/dashboard" className="text-slate-300 hover:text-white transition-colors">
+          Dashboard
+        </Link>
+        <Link to="/presensi" className="text-slate-300 hover:text-white transition-colors">
+          Presensi
+        </Link>
 
         {user?.role === "admin" && (
-          <Link to="/reports" className="hover:underline">Laporan Admin</Link>
+          <Link to="/reports" className="text-slate-300 hover:text-white transition-colors">
+            Laporan Admin
+          </Link>
         )}
       </div>
 
-      <div className="flex items-center space-x-4">
-        {user && <span>Halo, {user.nama}</span>}
+      {/* Profile & Logout Kanan */}
+      <div className="flex items-center space-x-4 text-sm">
+        {user && (
+          <span className="text-slate-400 font-medium">
+            Halo, <strong className="text-slate-200 font-semibold">{user.nama}</strong>
+          </span>
+        )}
         <button
           onClick={handleLogout}
-          className="bg-red-600 px-3 py-1 rounded hover:bg-red-700"
+          className="bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg transition-colors shadow-sm tracking-wide"
         >
-          Logout
+          LOGOUT
         </button>
       </div>
     </nav>
